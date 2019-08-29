@@ -1,25 +1,30 @@
 import DateUtils from '../utils/DateUtils';
 
+import MeetupService from '../services/MeetupService';
 import Meetup from '../models/Meetup';
 
 class MeetupController {
   async store(req, res) {
-    await Meetup.validate(req, res);
+    const errors = await MeetupService.validateStore(req);
 
-    // const { title, description, place, date, time, banner_id } = req.body;
+    if (errors.length > 0) {
+      res.status(412).json({ error: errors });
+    }
 
-    // const parsedDate = DateUtils.parseDateAndTimeToDate(date, time);
+    const { title, description, place, date, time, banner_id } = req.body;
 
-    // const meetup = await Meetup.create({
-    //   title,
-    //   description,
-    //   place,
-    //   date: parsedDate,
-    //   banner_id,
-    //   user_id: req.userId,
-    // });
+    const parsedDate = DateUtils.parseDateAndTimeToDate(date, time);
 
-    // return res.json(meetup);
+    const meetup = await Meetup.create({
+      title,
+      description,
+      place,
+      date: parsedDate,
+      banner_id,
+      user_id: req.userId,
+    });
+
+    return res.json(meetup);
   }
 }
 
