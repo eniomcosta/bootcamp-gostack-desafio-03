@@ -3,6 +3,7 @@ import { isBefore, parseISO } from 'date-fns';
 import DateUtils from '../utils/DateUtils';
 
 import File from '../models/File';
+import Meetup from '../models/Meetup';
 
 class MeetupService {
   static async validateStore(req) {
@@ -50,6 +51,50 @@ class MeetupService {
       errors.push(
         'Meetup date must be at least the next day from the current date'
       );
+    }
+
+    return errors;
+  }
+
+  static async validateUpdate(req) {
+    const errors = [];
+
+    const schema = Yup.object().shape({
+      title: Yup.string()
+        .min(3)
+        .max(255),
+      description: Yup.string()
+        .min(5)
+        .max(255),
+      place: Yup.string()
+        .min(5)
+        .max(255),
+      date: Yup.date(),
+      time: Yup.string(),
+      banner_id: Yup.number(),
+    });
+
+    await schema.validate(req.body, { abortEarly: false }).catch(err => {
+      errors.push(...err.errors);
+    });
+
+    if (errors.length > 0) return errors;
+
+    /**
+     * Check if the authenticated user is the meetup organizer
+     */
+    const meetup = await Meetup.findOne({
+      where: { id: req.params.id, user_id: req.userId },
+    });
+
+    if (!meetup) {
+      errors.push('Meetup not found');
+      return errors;
+    }
+
+    if (isBefore(meetup.date, new Date())) {
+      errors.push('Meetup already happened');
+      return errors;
     }
 
     return errors;

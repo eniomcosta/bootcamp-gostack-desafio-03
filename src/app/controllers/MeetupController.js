@@ -26,6 +26,16 @@ class MeetupController {
 
     return res.json(meetup);
   }
+
+  async update(req, res) {
+    const errors = await MeetupService.validateUpdate(req);
+
+    if (errors.length > 0) {
+      res.status(412).json({ error: errors });
+    }
+
+    return res.json();
+  }
 }
 
 export default new MeetupController();

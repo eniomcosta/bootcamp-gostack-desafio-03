@@ -1,9 +1,4 @@
 import Sequelize, { Model } from 'sequelize';
-import { isBefore, parseISO } from 'date-fns';
-import * as Yup from 'yup';
-import DateUtils from '../utils/DateUtils';
-
-import File from './File';
 
 class Meetup extends Model {
   static init(sequelize) {
