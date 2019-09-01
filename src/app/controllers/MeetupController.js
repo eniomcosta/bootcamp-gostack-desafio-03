@@ -4,6 +4,14 @@ import MeetupService from '../services/MeetupService';
 import Meetup from '../models/Meetup';
 
 class MeetupController {
+  async index(req, res) {
+    const meetups = await Meetup.findAll({
+      where: { user_id: req.userId },
+    });
+
+    return res.json(meetups);
+  }
+
   async store(req, res) {
     const errors = await MeetupService.validateStore(req);
 
@@ -33,6 +41,24 @@ class MeetupController {
     if (errors.length > 0) {
       res.status(412).json({ error: errors });
     }
+
+    const meetupToUpdate = await Meetup.findByPk(req.params.id);
+
+    const meetup = await meetupToUpdate.update(req.body);
+
+    return res.json(meetup);
+  }
+
+  async delete(req, res) {
+    const errors = await MeetupService.validateDelete(req);
+
+    if (errors.length > 0) {
+      return res.status(412).json({ error: errors });
+    }
+
+    const meetup = await Meetup.findByPk(req.params.id);
+
+    await meetup.destroy();
 
     return res.json();
   }

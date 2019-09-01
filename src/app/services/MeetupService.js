@@ -93,8 +93,35 @@ class MeetupService {
     }
 
     if (isBefore(meetup.date, new Date())) {
-      errors.push('Meetup already happened');
+      errors.push("You can't modify a meetup that already happened");
       return errors;
+    }
+
+    if (req.body.date && isBefore(parseISO(req.body.date), new Date())) {
+      errors.push("You can't modify a meetup to a past date");
+      return errors;
+    }
+
+    return errors;
+  }
+
+  static async validateDelete(req) {
+    const errors = [];
+
+    const meetup = await Meetup.findOne({
+      where: {
+        id: req.params.id,
+        user_id: req.userId,
+      },
+    });
+
+    if (!meetup) {
+      errors.push('Meetup not found');
+      return errors;
+    }
+
+    if (isBefore(meetup.date, new Date())) {
+      errors.push("You can't delete a meetup that is in the past");
     }
 
     return errors;
