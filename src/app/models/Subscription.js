@@ -5,6 +5,7 @@ class Subscription extends Model {
     super.init(
       {},
       {
+        updatedAt: false,
         sequelize,
       }
     );

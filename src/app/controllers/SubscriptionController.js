@@ -1,4 +1,5 @@
 import SubscriptionService from '../services/SubscriptionService';
+import Subscription from '../models/Subscription';
 
 class SubscriptionController {
   async store(req, res) {
@@ -8,7 +9,12 @@ class SubscriptionController {
       return res.status(412).json({ error: errors });
     }
 
-    return res.json();
+    const subscription = await Subscription.create({
+      meetup_id: req.body.meetup,
+      user_id: req.userId,
+    });
+
+    return res.json(subscription);
   }
 }
 

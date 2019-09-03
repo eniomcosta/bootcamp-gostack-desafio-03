@@ -7,13 +7,13 @@ class SubscriptionService {
   static async validateStore(req) {
     const errors = [];
 
-    if (!req.body.meetup_id) {
+    if (!req.body.meetup) {
       return ['Meetup not informed'];
     }
 
     const meetup = await Meetup.findOne({
       where: {
-        id: req.body.meetup_id,
+        id: req.body.meetup,
         user_id: {
           [Op.ne]: req.userId,
         },
@@ -26,7 +26,7 @@ class SubscriptionService {
 
     const alreadySubscribbed = await Subscription.findOne({
       where: {
-        meetup_id: req.body.meetup_id,
+        meetup_id: req.body.meetup,
         user_id: req.userId,
       },
     });
@@ -50,9 +50,9 @@ class SubscriptionService {
       },
     });
 
-    if (meetupSameHour) {
+    if (meetupSameHour.length > 0) {
       return [
-        "You can't subscribe to two of more meetups that happens at the same hour",
+        "You can't subscribe two or more meetups that happens at the same hour",
       ];
     }
 
