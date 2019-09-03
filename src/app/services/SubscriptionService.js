@@ -1,4 +1,4 @@
-import Op from 'sequelize';
+import { Op } from 'sequelize';
 import { startOfHour, endOfHour } from 'date-fns';
 import Meetup from '../models/Meetup';
 import Subscription from '../models/Subscription';
