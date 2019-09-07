@@ -1,3 +1,5 @@
+import { format } from 'date-fns';
+import en from 'date-fns/locale/en-US';
 import SubscriptionService from '../services/SubscriptionService';
 import Subscription from '../models/Subscription';
 import Meetup from '../models/Meetup';
@@ -28,10 +30,20 @@ class SubscriptionController {
       ],
     });
 
+    const subscriber = await User.findByPk(req.userId);
+
     await Mail.sendMail({
       to: `${selectedMeetup.organizer.name} <${selectedMeetup.organizer.email}>`,
       subject: `Subscription to ${selectedMeetup.title}`,
-      text: 'A subscription has been made to a the meetup',
+      template: 'subscription',
+      context: {
+        organizer: selectedMeetup.organizer.name,
+        meetup: selectedMeetup.title,
+        user: subscriber.name,
+        date: format(new Date(), "MMMM dd'th at' H:mm", {
+          locale: en,
+        }),
+      },
     });
 
     return res.json(subscription);
